@@ -1,36 +1,50 @@
 package ru.greed.cleancodeproject.service;
 
+import org.apache.commons.collections4.CollectionUtils;
+import ru.greed.cleancodeproject.config.DiscountRules;
+import ru.greed.cleancodeproject.model.CustomerType;
 import ru.greed.cleancodeproject.model.Item;
 
 import java.util.List;
+import java.util.Objects;
 
 public class OrderService {
 
     /**
      * Считает итоговую стоимость корзины с учетом скидок.
      *
-     * @param items товары в корзине
-     * @param type  статус клиента (VIP, NEW, REGULAR)
+     * @param cart товары в корзине
+     * @param clientType статус клиента (VIP, NEW, REGULAR)
      * @return сумма к оплате
      */
-    public double calc(List<Item> items, String type) {
-        double s = 0;
-        for (Item i : items) {
-            s += i.getPrice() * i.getQuantity();
+    public double calc(List<Item> cart, String clientType) {
+        if (CollectionUtils.isEmpty(cart)) {
+            return 0.0;
         }
 
-        if (type.equals("VIP")) {
-            s = s * 0.9;
-        }
+        double total = getBaseTotal(cart);
+        total = applyClientDiscount(total, clientType);
+        total = applyBigCheckDiscount(total);
 
-        if (type.equals("NEW")) {
-            s = s * 0.95;
-        }
+        return total;
+    }
 
-        if (s > 1000) {
-            s = s - 50;
-        }
+    private double getBaseTotal(List<Item> cart) {
+        return cart.stream()
+                .filter(Objects::nonNull)
+                .mapToDouble(item -> item.price() * item.quantity())
+                .sum();
+    }
 
-        return s;
+    private double applyClientDiscount(double total, String clientType) {
+        CustomerType type = CustomerType.fromString(clientType);
+        return total * type.getDiscountRate();
+    }
+
+    private double applyBigCheckDiscount(double total) {
+        if (total > DiscountRules.BIG_CHECK_LIMIT) {
+            return total - DiscountRules.BIG_CHECK_DISCOUNT;
+        }
+        return total;
     }
 }
