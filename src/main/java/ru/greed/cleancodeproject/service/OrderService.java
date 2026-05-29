@@ -24,6 +24,7 @@ public class OrderService {
 
         double total = getBaseTotal(cart);
         total = applyClientDiscount(total, clientType);
+        total = applyBulkDiscount(total, cart);
         total = applyBigCheckDiscount(total);
 
         return total;
@@ -39,6 +40,18 @@ public class OrderService {
     private double applyClientDiscount(double total, String clientType) {
         CustomerType type = CustomerType.fromString(clientType);
         return total * type.getDiscountRate();
+    }
+
+    private double applyBulkDiscount(double total, List<Item> cart) {
+        int totalQuantity = cart.stream()
+                .filter(Objects::nonNull)
+                .mapToInt(Item::quantity)
+                .sum();
+
+        if (totalQuantity > DiscountRules.BULK_LIMIT) {
+            return total * DiscountRules.BULK_DISCOUNT;
+        }
+        return total;
     }
 
     private double applyBigCheckDiscount(double total) {
