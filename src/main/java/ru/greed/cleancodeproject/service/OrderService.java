@@ -5,6 +5,14 @@ import ru.greed.cleancodeproject.model.Item;
 import java.util.List;
 
 public class OrderService {
+
+    /**
+     * Считает итоговую стоимость корзины с учетом скидок.
+     *
+     * @param items товары в корзине
+     * @param type  статус клиента (VIP, NEW, REGULAR)
+     * @return сумма к оплате
+     */
     public double calc(List<Item> items, String type) {
         double s = 0;
         for (Item i : items) {
