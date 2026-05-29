@@ -44,4 +44,13 @@ class OrderServiceTest {
         double total = orderService.calc(cart, "REGULAR");
         assertEquals(1150.0, total, 0.001);
     }
+
+    @Test
+    @DisplayName("Скидка за опт")
+    void bulk() {
+        // 11 товаров по 10.0 = 110.0. Ожидаем скидку 1%: 110.0 * 0.99 = 108.9
+        List<Item> cart = Collections.singletonList(new Item("Ручка", 10.0, 11));
+        double total = orderService.calc(cart, "REGULAR");
+        assertEquals(108.9, total, 0.001);
+    }
 }
