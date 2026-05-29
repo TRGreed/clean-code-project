@@ -10,7 +10,7 @@
     </parent>
     <groupId>ru.greed</groupId>
     <artifactId>clean-code-project</artifactId>
-    <version>0.0.3</version>
+    <version>1.0.0</version>
     <name>clean-code-project</name>
     <description>clean-code-project</description>
 
